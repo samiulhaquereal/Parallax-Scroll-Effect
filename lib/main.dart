@@ -45,7 +45,17 @@ class _MyHomePageState extends State<MyHomePage> {
   void _onScroll(){
     setState(() {
       _scrollOffset = _scrollController.offset;
-      print(_scrollOffset);
+      //print(_scrollOffset);
+
+      //find middle of the screen
+      if(_screenHeight == null || _layoutHeight == null) return;
+      print('layout position - ${_scrollOffset*_layerSpeed1} ** middle of the screen - ${_screenHeight! * 0.6}');
+      if(_scrollOffset * _layerSpeed1 > _screenHeight! * 0.6){
+        print('reach to the middle');
+        showText = true;
+      }else{
+        showText = false;
+      }
     });
   }
 
@@ -62,10 +72,19 @@ class _MyHomePageState extends State<MyHomePage> {
   double _layerHSpeed3 = 0.075;
   double _layerHSpeed4 = 0.07;
 
+  bool showText = false;
+
+  double? _layoutHeight;
+  double? _screenHeight;
+
   @override
   Widget build(BuildContext context) {
     var layoutHeight = MediaQuery.of(context).size.height * 3;
     var screenSize = MediaQuery.of(context).size;
+
+    this._layoutHeight = layoutHeight;
+    this._screenHeight = screenSize.height;
+
     return SafeArea(child: Scaffold(
       body: Container(
         decoration: BoxDecoration(
@@ -81,37 +100,48 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Stack(
           children: [
             Positioned(
-                bottom: layoutHeight * 0.13 + (_scrollOffset * _sunSpeed),
+                bottom: screenSize.height * 0.1 + (_scrollOffset * _sunSpeed),
                 right: screenSize.width * 0.3,
                 left: 0,
+                height: screenSize.height,
                 child: SvgPicture.asset('assets/images/sun.svg')),
             Positioned(
-                bottom: (_layerSpeed4 * _scrollOffset) - 45,
-                right: 0,
-                left: 0,
-                child: SvgPicture.asset('assets/images/mountains-layer-4.svg')),
+                bottom: (_layerSpeed4 * _scrollOffset) + 5 ,
+                right: _layerHSpeed4 * _scrollOffset * -1,
+                left: _layerHSpeed4 * _scrollOffset * -1,
+                height: screenSize.height,
+                child: SvgPicture.asset('assets/images/mountains-layer-4.svg',alignment: Alignment.bottomCenter)),
             Positioned(
-                bottom: (_layerSpeed3 * _scrollOffset) -45,
-                right: 0,
-                left: 0,
-                child: SvgPicture.asset('assets/images/mountains-layer-2.svg')),
+                bottom: (_layerSpeed3 * _scrollOffset) ,
+                right: _layerHSpeed3 * _scrollOffset * -1,
+                left: _layerHSpeed3 * _scrollOffset * -1,
+                height: screenSize.height,
+                child: SvgPicture.asset('assets/images/mountains-layer-2.svg',alignment: Alignment.bottomCenter)),
             Positioned(
-                bottom: (_layerSpeed2 * _scrollOffset) -45,
-                right: 0,
-                left: 0,
-                child: SvgPicture.asset('assets/images/trees-layer-2.svg')),
+                bottom: (_layerSpeed2 * _scrollOffset) - 5,
+                right: _layerHSpeed2 * _scrollOffset * -1,
+                left: _layerHSpeed2 * _scrollOffset * -1,
+                height: screenSize.height,
+                child: SvgPicture.asset('assets/images/trees-layer-2.svg',alignment: Alignment.bottomCenter)),
             Positioned(
-                bottom:-70 + (_layerSpeed1 * _scrollOffset) ,
-                right: 0,
-                left: 0,
-                child: SvgPicture.asset('assets/images/layer-1.svg')),
+                bottom:-15 + (_layerSpeed1 * _scrollOffset) ,
+                right: _layerHSpeed1 * _scrollOffset * -1,
+                left: _layerHSpeed1 * _scrollOffset * -1,
+                height: screenSize.height,
+                child: SvgPicture.asset('assets/images/layer-1.svg',fit: BoxFit.fitWidth,alignment: Alignment.bottomCenter,)),
+
             Positioned(
-                top: screenSize.height + (_layerSpeed1 * _scrollOffset * -1) - 40 ,
+                top: screenSize.height + (_layerSpeed1 * _scrollOffset * -1)-40 ,
                 right: 0,
                 left: 0,
+                height: screenSize.height + 20,
                 child: Container(
                   color: Colors.black,
-                  height: layoutHeight,
+                  child: Center(
+                      child: AnimatedOpacity(
+                          opacity: showText ? 1 : 0,
+                          duration: Duration(milliseconds: 750),
+                          child: Text('This is the parallax effect',style: TextStyle(fontSize: 25,color: Colors.white),))),
                 )),
             Positioned.fill(
                 child: SingleChildScrollView(
